@@ -11,8 +11,8 @@ use ego_tree::NodeId;
 use ratatui::{
     layout::{Constraint, Direction, Layout},
     style::{Style, Stylize},
-    text::Line,
-    widgets::{Block, Borders, List, ListState},
+    text::{Line, Text},
+    widgets::{Block, Borders, List, ListState, Paragraph},
     Frame,
 };
 use std::path::Path;
@@ -104,7 +104,7 @@ impl AppState {
 
         let chunks = Layout::default()
             .direction(Direction::Vertical)
-            .constraints([Constraint::Length(3), Constraint::Min(1)].as_ref())
+            .constraints([Constraint::Length(3), Constraint::Min(1), Constraint::Length(3)].as_ref())
             .split(horizontal[1]);
 
         self.filter.draw_searchbar(frame, chunks[0], &self.theme);
@@ -115,6 +115,12 @@ impl AppState {
                 Line::from(format!("{}  ..", self.theme.dir_icon())).style(self.theme.dir_color()),
             );
         }
+
+        // Add shortcut guide at the bottom
+        let text = Text::raw("Q - quit, P - preview, Enter - run, / - search");
+        let info = Paragraph::new(text)
+            .block(Block::default().borders(Borders::ALL));
+        frame.render_widget(info, chunks[2]);
 
         items.extend(self.filter.item_list().iter().map(
             |ListEntry {
